@@ -1,2 +1,5 @@
 {"timestamp":"2024-06-28T12:00:00Z","server_name":"server1","cpu_utilization":45,"memory_used_mb":2048,"network_in_kbps":300,"network_out_kbps":150}
 --jars C:\spark\jars\kafka\spark-sql-kafka-0-10_2.12-3.4.4.jar,C:\spark\jars\kafka\kafka-clients-3.3.2.jar,C:\spark\jars\kafka\commons-pool2-2.11.1.jar
+
+
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.4 C:\Users\amana\OneDrive\Desktop\Nnmi\nnmi_kafka_ingest.py
