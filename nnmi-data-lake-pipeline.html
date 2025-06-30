@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>nnmi-data-lake-pipeline.md</title>
+<meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+
+<style>
+/* https://github.com/microsoft/vscode/blob/master/extensions/markdown-language-features/media/markdown.css */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+body {
+	font-family: var(--vscode-markdown-font-family, -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif);
+	font-size: var(--vscode-markdown-font-size, 14px);
+	padding: 0 26px;
+	line-height: var(--vscode-markdown-line-height, 22px);
+	word-wrap: break-word;
+}
+
+#code-csp-warning {
+	position: fixed;
+	top: 0;
+	right: 0;
+	color: white;
+	margin: 16px;
+	text-align: center;
+	font-size: 12px;
+	font-family: sans-serif;
+	background-color:#444444;
+	cursor: pointer;
+	padding: 6px;
+	box-shadow: 1px 1px 1px rgba(0,0,0,.25);
+}
+
+#code-csp-warning:hover {
+	text-decoration: none;
+	background-color:#007acc;
+	box-shadow: 2px 2px 2px rgba(0,0,0,.25);
+}
+
+body.scrollBeyondLastLine {
+	margin-bottom: calc(100vh - 22px);
+}
+
+body.showEditorSelection .code-line {
+	position: relative;
+}
+
+body.showEditorSelection .code-active-line:before,
+body.showEditorSelection .code-line:hover:before {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: -12px;
+	height: 100%;
+}
+
+body.showEditorSelection li.code-active-line:before,
+body.showEditorSelection li.code-line:hover:before {
+	left: -30px;
+}
+
+.vscode-light.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.15);
+}
+
+.vscode-light.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(0, 0, 0, 0.40);
+}
+
+.vscode-light.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-dark.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.4);
+}
+
+.vscode-dark.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 255, 255, 0.60);
+}
+
+.vscode-dark.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+.vscode-high-contrast.showEditorSelection .code-active-line:before {
+	border-left: 3px solid rgba(255, 160, 0, 0.7);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line:hover:before {
+	border-left: 3px solid rgba(255, 160, 0, 1);
+}
+
+.vscode-high-contrast.showEditorSelection .code-line .code-line:hover:before {
+	border-left: none;
+}
+
+img {
+	max-width: 100%;
+	max-height: 100%;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+a:focus,
+input:focus,
+select:focus,
+textarea:focus {
+	outline: 1px solid -webkit-focus-ring-color;
+	outline-offset: -1px;
+}
+
+hr {
+	border: 0;
+	height: 2px;
+	border-bottom: 2px solid;
+}
+
+h1 {
+	padding-bottom: 0.3em;
+	line-height: 1.2;
+	border-bottom-width: 1px;
+	border-bottom-style: solid;
+}
+
+h1, h2, h3 {
+	font-weight: normal;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table > thead > tr > th {
+	text-align: left;
+	border-bottom: 1px solid;
+}
+
+table > thead > tr > th,
+table > thead > tr > td,
+table > tbody > tr > th,
+table > tbody > tr > td {
+	padding: 5px 10px;
+}
+
+table > tbody > tr + tr > td {
+	border-top: 1px solid;
+}
+
+blockquote {
+	margin: 0 7px 0 5px;
+	padding: 0 16px 0 10px;
+	border-left-width: 5px;
+	border-left-style: solid;
+}
+
+code {
+	font-family: Menlo, Monaco, Consolas, "Droid Sans Mono", "Courier New", monospace, "Droid Sans Fallback";
+	font-size: 1em;
+	line-height: 1.357em;
+}
+
+body.wordWrap pre {
+	white-space: pre-wrap;
+}
+
+pre:not(.hljs),
+pre.hljs code > div {
+	padding: 16px;
+	border-radius: 3px;
+	overflow: auto;
+}
+
+pre code {
+	color: var(--vscode-editor-foreground);
+	tab-size: 4;
+}
+
+/** Theming */
+
+.vscode-light pre {
+	background-color: rgba(220, 220, 220, 0.4);
+}
+
+.vscode-dark pre {
+	background-color: rgba(10, 10, 10, 0.4);
+}
+
+.vscode-high-contrast pre {
+	background-color: rgb(0, 0, 0);
+}
+
+.vscode-high-contrast h1 {
+	border-color: rgb(0, 0, 0);
+}
+
+.vscode-light table > thead > tr > th {
+	border-color: rgba(0, 0, 0, 0.69);
+}
+
+.vscode-dark table > thead > tr > th {
+	border-color: rgba(255, 255, 255, 0.69);
+}
+
+.vscode-light h1,
+.vscode-light hr,
+.vscode-light table > tbody > tr + tr > td {
+	border-color: rgba(0, 0, 0, 0.18);
+}
+
+.vscode-dark h1,
+.vscode-dark hr,
+.vscode-dark table > tbody > tr + tr > td {
+	border-color: rgba(255, 255, 255, 0.18);
+}
+
+</style>
+
+<style>
+/* Tomorrow Theme */
+/* http://jmblog.github.com/color-themes-for-google-code-highlightjs */
+/* Original theme - https://github.com/chriskempson/tomorrow-theme */
+
+/* Tomorrow Comment */
+.hljs-comment,
+.hljs-quote {
+	color: #8e908c;
+}
+
+/* Tomorrow Red */
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag,
+.hljs-name,
+.hljs-selector-id,
+.hljs-selector-class,
+.hljs-regexp,
+.hljs-deletion {
+	color: #c82829;
+}
+
+/* Tomorrow Orange */
+.hljs-number,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-literal,
+.hljs-type,
+.hljs-params,
+.hljs-meta,
+.hljs-link {
+	color: #f5871f;
+}
+
+/* Tomorrow Yellow */
+.hljs-attribute {
+	color: #eab700;
+}
+
+/* Tomorrow Green */
+.hljs-string,
+.hljs-symbol,
+.hljs-bullet,
+.hljs-addition {
+	color: #718c00;
+}
+
+/* Tomorrow Blue */
+.hljs-title,
+.hljs-section {
+	color: #4271ae;
+}
+
+/* Tomorrow Purple */
+.hljs-keyword,
+.hljs-selector-tag {
+	color: #8959a8;
+}
+
+.hljs {
+	display: block;
+	overflow-x: auto;
+	color: #4d4d4c;
+	padding: 0.5em;
+}
+
+.hljs-emphasis {
+	font-style: italic;
+}
+
+.hljs-strong {
+	font-weight: bold;
+}
+</style>
+
+<style>
+/*
+ * Markdown PDF CSS
+ */
+
+ body {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe WPC", "Segoe UI", "Ubuntu", "Droid Sans", sans-serif, "Meiryo";
+	padding: 0 12px;
+}
+
+pre {
+	background-color: #f8f8f8;
+	border: 1px solid #cccccc;
+	border-radius: 3px;
+	overflow-x: auto;
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
+
+pre:not(.hljs) {
+	padding: 23px;
+	line-height: 19px;
+}
+
+blockquote {
+	background: rgba(127, 127, 127, 0.1);
+	border-color: rgba(0, 122, 204, 0.5);
+}
+
+.emoji {
+	height: 1.4em;
+}
+
+code {
+	font-size: 14px;
+	line-height: 19px;
+}
+
+/* for inline code */
+:not(pre):not(.hljs) > code {
+	color: #C9AE75; /* Change the old color so it seems less like an error */
+	font-size: inherit;
+}
+
+/* Page Break : use <div class="page"/> to insert page break
+-------------------------------------------------------- */
+.page {
+	page-break-after: always;
+}
+
+</style>
+
+<script src="https://unpkg.com/mermaid/dist/mermaid.min.js"></script>
+</head>
+<body>
+  <script>
+    mermaid.initialize({
+      startOnLoad: true,
+      theme: document.body.classList.contains('vscode-dark') || document.body.classList.contains('vscode-high-contrast')
+          ? 'dark'
+          : 'default'
+    });
+  </script>
+<h1 id="%F0%9F%9F%A2-nnmi-local-data-lake-pipeline">🟢 NNMi Local Data Lake Pipeline</h1>
+<hr>
+<h2 id="%F0%9F%93%98-project-overview">📘 Project Overview</h2>
+<p>This pipeline sets up a <strong>local data lake</strong> on your workstation using open-source technologies:</p>
+<ul>
+<li><strong>NNMi (HP Network Node Manager i)</strong> sends JSON metrics.</li>
+<li><strong>Apache Kafka</strong> buffers and distributes the messages.</li>
+<li><strong>Apache Spark Structured Streaming</strong> processes and converts the data.</li>
+<li><strong>MinIO</strong> stores data as Parquet files and manages checkpoint metadata.</li>
+</ul>
+<p>The result is a <strong>queryable, reliable, scalable data lake</strong> running locally.</p>
+<hr>
+<h2 id="%F0%9F%8E%AF-objectives">🎯 Objectives</h2>
+<p>✅ Ingest metrics from NNMi via Kafka<br>
+✅ Parse JSON payloads (single or multiple records)<br>
+✅ Store columnar data in MinIO using Parquet format<br>
+✅ Use Spark checkpoints to ensure exactly-once delivery</p>
+<hr>
+<h2 id="%F0%9F%9B%A0%EF%B8%8F-technologies-used">🛠️ Technologies Used</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Technology</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Metric Producer</strong></td>
+<td>NNMi</td>
+<td>Emits JSON metrics</td>
+</tr>
+<tr>
+<td><strong>Message Broker</strong></td>
+<td>Apache Kafka</td>
+<td>Buffers and streams the messages</td>
+</tr>
+<tr>
+<td><strong>Stream Processor</strong></td>
+<td>Apache Spark Structured Streaming (PySpark)</td>
+<td>Reads Kafka, parses JSON, writes to MinIO</td>
+</tr>
+<tr>
+<td><strong>Serialization</strong></td>
+<td>Parquet</td>
+<td>Columnar storage optimized for analytics</td>
+</tr>
+<tr>
+<td><strong>Object Storage</strong></td>
+<td>MinIO (S3-compatible)</td>
+<td>Stores metrics and checkpoints</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%F0%9F%96%BC%EF%B8%8F-architecture-diagram">🖼️ Architecture Diagram</h2>
+<p><img src="Architecture.png" alt="NNMi Data Lake Architecture"></p>
+<hr>
+<h2 id="%F0%9F%94%84-data-flow">🔄 Data Flow</h2>
+<ol>
+<li><strong>NNMi</strong> continuously pushes JSON-formatted metrics to Kafka (<code>nnmi-metrics</code> topic).</li>
+<li><strong>Spark Structured Streaming</strong>:
+<ul>
+<li>Reads Kafka messages.</li>
+<li>Parses JSON data into a structured DataFrame.</li>
+<li>Supports:
+<ul>
+<li>Single JSON object:<pre class="hljs"><code><div>{
+  <span class="hljs-attr">"timestamp"</span>: <span class="hljs-string">"2025-06-28T12:00:00Z"</span>,
+  <span class="hljs-attr">"server_name"</span>: <span class="hljs-string">"Server1"</span>,
+  <span class="hljs-attr">"cpu_utilization"</span>: <span class="hljs-number">45</span>,
+  <span class="hljs-attr">"memory_used_mb"</span>: <span class="hljs-number">2048</span>,
+  <span class="hljs-attr">"network_in_kbps"</span>: <span class="hljs-number">120</span>,
+  <span class="hljs-attr">"network_out_kbps"</span>: <span class="hljs-number">80</span>
+}
+</div></code></pre>
+</li>
+<li>Or JSON array:<pre class="hljs"><code><div>[
+  {...},
+  {...}
+]
+</div></code></pre>
+</li>
+</ul>
+</li>
+<li>Flattens the data.</li>
+<li>Writes Parquet files to:<pre class="hljs"><code><div>s3a://nnmi-data/metrics/
+</div></code></pre>
+</li>
+<li>Records checkpoint data to:<pre class="hljs"><code><div>s3a://nnmi-data/checkpoints/
+</div></code></pre>
+</li>
+</ul>
+</li>
+<li>You can query the Parquet data in Spark SQL, Presto, or other tools.</li>
+</ol>
+<hr>
+<h2 id="%F0%9F%A7%A9-schema">🧩 Schema</h2>
+<table>
+<thead>
+<tr>
+<th>Field</th>
+<th>Type</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>timestamp</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>server_name</code></td>
+<td>String</td>
+</tr>
+<tr>
+<td><code>cpu_utilization</code></td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>memory_used_mb</code></td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>network_in_kbps</code></td>
+<td>Integer</td>
+</tr>
+<tr>
+<td><code>network_out_kbps</code></td>
+<td>Integer</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2 id="%F0%9F%92%A1-key-benefits">💡 Key Benefits</h2>
+<p>✅ <strong>Exactly-once delivery</strong> using checkpoints<br>
+✅ <strong>Columnar storage</strong> for fast analytics<br>
+✅ <strong>Support for both single and multiple JSON records</strong><br>
+✅ <strong>Local S3-compatible storage</strong> (MinIO)</p>
+<hr>
+<h2 id="%E2%9A%99%EF%B8%8F-tips--notes">⚙️ Tips &amp; Notes</h2>
+<ul>
+<li>Keep MinIO running during ingestion (<code>minio server /path/to/data</code>).</li>
+<li>Use <code>spark-submit</code> with all Kafka and Hadoop dependencies:
+spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.4 your_script.py</li>
+</ul>
+<p>csharp
+Copy
+Edit</p>
+<ul>
+<li>Spark 3.4.x works well with Python ≤3.11 (not 3.12).</li>
+<li>For testing, you can produce sample JSON into Kafka using <code>kafka-console-producer</code>.</li>
+<li>Parquet files can be easily explored using:</li>
+</ul>
+<pre class="hljs"><code><div>df = spark.read.parquet(<span class="hljs-string">"s3a://nnmi-data/metrics/"</span>)
+df.show()
+You can partition data by date/hour <span class="hljs-keyword">for</span> better performance.
+
+</div></code></pre>
+
+</body>
+</html>
