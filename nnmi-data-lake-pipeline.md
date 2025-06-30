@@ -107,15 +107,119 @@ The result is a **queryable, reliable, scalable data lake** running locally.
 - Keep MinIO running during ingestion (`minio server /path/to/data`).
 - Use `spark-submit` with all Kafka and Hadoop dependencies:
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.4 your_script.py
-
-csharp
-Copy
-Edit
 - Spark 3.4.x works well with Python ≤3.11 (not 3.12).
 - For testing, you can produce sample JSON into Kafka using `kafka-console-producer`.
 - Parquet files can be easily explored using:
-```python
+(python)
 df = spark.read.parquet("s3a://nnmi-data/metrics/")
 df.show()
 You can partition data by date/hour for better performance.
+
+---
+
+## 🗂️ What Are `metrics` and `checkpoints`?
+
+### 🎯 Overview
+
+When you run your pipeline, Spark creates **two critical folders in MinIO**:
+
+---
+
+### 🟢 1️⃣ `metrics` Folder
+
+This is **your actual data lake storage**.
+
+✅ **What it contains:**
+
+- Parquet files with ingested records:
+s3a://nnmi-data/metrics/
+part-00000-.parquet
+part-00001-.parquet
+
+markdown
+Copy
+Edit
+- Each file holds structured tabular data.
+
+✅ **Purpose:**
+
+- Stores your **historical and current metrics** for analysis.
+- Can be queried via Spark SQL or other engines.
+
+✅ **Example:**
+
+| timestamp             | server_name | cpu_utilization | memory_used_mb | network_in_kbps | network_out_kbps |
+|-----------------------|-------------|-----------------|----------------|-----------------|------------------|
+| 2025-06-28T12:00:00Z  | Server1     | 45              | 2048           | 120             | 80               |
+
+✅ **Analogy:**
+
+> Think of `metrics` as **your warehouse shelves** where all collected data lives.
+
+---
+
+### 🟡 2️⃣ `checkpoints` Folder
+
+This is **internal metadata Spark uses to track progress**.
+
+✅ **What it contains:**
+
+- Files like:
+s3a://nnmi-data/checkpoints/
+metadata
+offsets/0
+commits/0
+sources/0
+
+yaml
+Copy
+Edit
+- They track:
+- Kafka offsets already read
+- Which batches were processed
+- Exactly-once delivery info
+
+✅ **Purpose:**
+
+- Ensures **Spark knows where to resume**.
+- Prevents duplicates if the job stops and restarts.
+
+✅ **Analogy:**
+
+> Think of `checkpoints` as **your bookkeeping ledger** that says:
+> “I processed up to offset 1234. Next time, start from 1235.”
+
+---
+
+### 🧩 How They Work Together
+
+**Example Workflow:**
+
+1️⃣ **First run:**
+- Reads offsets 0–999.
+- Writes Parquet data to `metrics`.
+- Saves checkpoint info up to offset 999.
+
+2️⃣ **Second run:**
+- Starts at offset 1000 (avoids reprocessing).
+
+✅ **Why you should keep both:**
+- Deleting `checkpoints` = duplicate ingestion.
+- Deleting `metrics` = data loss.
+
+---
+
+### 🚀 Quick Recap
+
+| Folder       | What It Is                           | Why It Matters                      |
+|--------------|--------------------------------------|--------------------------------------|
+| `metrics`    | Parquet data lake storage           | Holds your usable metrics data      |
+| `checkpoints`| Spark’s tracking metadata           | Enables exactly-once processing     |
+
+---
+
+💡 **Tip:**  
+Always backup both folders if you migrate or clean up MinIO.
+
+---
 
