@@ -3,3 +3,5 @@
 
 
 spark-submit --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.4.4 C:\Users\amana\OneDrive\Desktop\Nnmi\nnmi_kafka_ingest.py
+
+spark-submit --jars "C:\spark\jars\kafka\spark-sql-kafka-0-10_2.12-3.4.4.jar,C:\spark\jars\kafka\spark-token-provider-kafka-0-10_2.12-3.4.4.jar,C:\spark\jars\kafka\kafka-clients-3.3.2.jar,C:\spark\jars\kafka\commons-pool2-2.11.1.jar" your_script.py
