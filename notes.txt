@@ -1,0 +1,1 @@
+{"timestamp":"2024-06-28T12:00:00Z","server_name":"server1","cpu_utilization":45,"memory_used_mb":2048,"network_in_kbps":300,"network_out_kbps":150}
